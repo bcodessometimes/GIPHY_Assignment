@@ -67,9 +67,6 @@ $("button").on("click", function(){
         animalDiv.append(animalImage);
 
         $("#gifDiv").prepend(animalDiv);
-        
-        
-
       }
    
       
