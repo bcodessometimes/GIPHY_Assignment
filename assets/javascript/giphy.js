@@ -2,30 +2,69 @@
 var itemArray = ["cat", "dog", "mouse", "elephant"];
 var apiKey = "rqcSo1qF6lKTtawP3hwe4gab9J4gh4RG"
 var input;
-var temp;
-var a;
-var animalImage;
-var animalDiv;
-var i;
+
 
 //on load clear buttons and populate from itemArray
 function onStart() {
-    
+    $("#buttonDiv").empty();
     for(var i = 0; i < itemArray.length; i++) {
-        a = $("<button>"); 
+        
+        var a = $("<button>"); 
         a.text(itemArray[i]);
+        a.attr("data-animal", itemArray[i])
         a.addClass("static-btn");
         $("#buttonDiv").append(a);
     }
 
 };
 
-
 $("body").on("click", ".static-btn", function (){
-    alert("working");
-    $(".static-btn").val().append(temp);
-    console.log(temp);
+    
+    input = $(this).data("animal");
+    input2 = $(this).text();
+    console.log(input);
+    console.log(input2);
+    //itemArray.push(input);
+    console.log(itemArray);
+    $("#gifDiv").empty();
+    var queryURL = `https://api.giphy.com/v1/gifs/search?api_key=rqcSo1qF6lKTtawP3hwe4gab9J4gh4RG&q=` + input + `&limit=10&offset=0&rating=G&lang=en`
+
+    $.ajax({
+        url: queryURL,
+        method: "GET"
+      })
+
+    .then(function(response){
+        
+       console.log(queryURL);
+       console.log(response);
+       var results = response.data;
+
+       for (i = 0; i < results.length; i++) {
+
+        var animalDiv = $("<div>");
+
+        var p = $("<p>").text("Rating: " + results[i].rating);
+        var live = results[i].images.fixed_height.url;
+        var still = results[i].images.fixed_height_still.url;
+        var animalImage = $("<img>");
+
+        animalImage.attr("src", still);
+        animalImage.attr("data-still", still);
+        animalImage.attr("data-live", live);
+        animalImage.attr("data-state", "still");
+        animalImage.addClass("animalShit");
+        
+        animalDiv.append(p);
+        animalDiv.append(animalImage);
+
+        $("#gifDiv").prepend(animalDiv);
+      }
+      
+    })
+    
 });
+
 
 $("#button-addon2").on("click", function(){
     $("#buttonDiv").empty();
@@ -38,54 +77,21 @@ $("#button-addon2").on("click", function(){
 });
 
 
-//ajax call
-$("button").on("click", function(){
-    $("#gifDiv").empty();
-    var queryURL = `https://api.giphy.com/v1/gifs/search?api_key=rqcSo1qF6lKTtawP3hwe4gab9J4gh4RG&q=` + input + `&limit=2&offset=0&rating=G&lang=en`
+//ajax call 
 
-    $.ajax({
-        url: queryURL,
-        method: "GET"
-      })
+$("body").on("click", "img", function(){
 
-    .then(function(response){
-        
-       console.log(queryURL);
-       console.log(response);
-       results = response.data;
+    var state = $(this).attr("data-state");
 
-       for (i = 0; i < results.length; i++) {
+    if(state == "still") {
+        $(this).attr("src", $(this).data("live"));
+        $(this).attr("data-state", "live"); 
 
-        animalDiv = $("<div>");
+    } else {
+    $(this).attr("src", $(this).data("still"));
+    $(this).attr("data-state", "still"); 
+    }
 
-        var p = $("<p>").text("Rating: " + results[i].rating);
-
-        animalImage = $("<img>");
-        animalImage.attr("src", results[i].images.fixed_height.url);
-
-        animalDiv.append(p);
-        animalDiv.append(animalImage);
-
-        $("#gifDiv").prepend(animalDiv);
-      }
-   
-      
-    })
-    
-});
-
-// $("body").on("click", "img", function(){
-//     alert("works");
-//     animalImage.attr("src", results[i].images.fixed_height_still.url); 
-// })
-// console.log(response);
-
-//response dosent exist outside the function.. I dont know how to build this click event inside my function with my ajax call
-//my thought process is to just change the attribute to the still image on click.
-
-// $("body").on("click", "img", function(){
-//     alert("works");
-//     animalImage.attr("src", results[i].images.fixed_height_still.url); 
-// })
+})
 
 onStart();
